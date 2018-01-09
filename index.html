@@ -259,10 +259,90 @@ $(function(){
 	}
 	
 	
-	showdata();
+	//showdata();
 	
-	
-	
+		var code = {
+			"data":[
+				{
+					"name":"青岛",
+					"log":120.33,
+					"log2":36.07,
+					"value":4340,
+					"fla":10,
+					"citype":2
+				},{
+					"name":"保定",
+					"log":115.48,
+					"log2":38.85,
+					"value":1110,
+					"fla":10,
+					"citype":2
+				},{
+					"name":"鄂尔多斯",
+					"log":109.781327,
+					"log2":39.608266,
+					"value":2340,
+					"fla":-10,
+					"citype":2
+				},{
+					"name":"东莞",
+					"log":113.75,
+					"log2":23.04,
+					"value":4000,
+					"fla":0,
+					"citype":1,
+					"idname":"广东"
+				},{
+					"name":"乌鲁木齐",
+					"log":87.68,
+					"log2":43.77,
+					"value":4000,
+					"fla":40,
+					"citype":1,
+					"idname":"新疆",
+					"city":"新疆"
+				},{
+					"name":"二位翁无",
+					"log":87.68,
+					"log2":43.77,
+					"value":4000,
+					"fla":40,
+					"citype":1,
+					"idname":"新疆",
+					"city":"新疆"
+				},{
+					"name":"嗯我热无若",
+					"log":87.68,
+					"log2":43.77,
+					"value":4000,
+					"fla":40,
+					"citype":1,
+					"idname":"新疆",
+					"city":"新疆"
+				},{
+					"name":"重庆",
+					"log":106.54,
+					"log2":29.59,
+					"value":4000,
+					"fla":-10,
+					"citype":1,
+					"idname":"重庆",
+					"city":"重庆"
+				},{
+					"name":"你好吗",
+					"log":106.54,
+					"log2":29.59,
+					"value":4000,
+					"fla":-10,
+					"citype":1,
+					"idname":"重庆",
+					"city":"重庆"
+				}
+
+			],
+			"updown":20
+		}
+	makeSvg(code)
 });
 
 </script>
@@ -313,25 +393,7 @@ $(function(){
 	
 </div>
 
-<div class="ecWrap">
-	<span class="closeBtn">X</span>
-	<div class="mainCon">
-		<h2>抗震螺纹钢</h2>
-		<div class="tCon">
-			<ul class="clearfix thead">
-				<li>价格</li>
-				<li>涨幅</li>
-			</ul>
-			<div class="tbody">
-				<ul class="clearfix">
-					<li>4500</li>
-					<li>+30</li>
-				</ul>
-			</div>
-		</div>
-		<div id="main" style="width:400px; height:400px; margin-top:5px;"></div>
-	</div>	
-</div>
+
 
 
 
