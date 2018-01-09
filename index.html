@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;">
+<link rel="stylesheet" href="css/style.css" />
+<script src="js/jq.js"></script>
+<script src="js/fn.js"></script>
+<script src="js/d3.js" type="text/javascript" charset="utf-8"></script>
+
+<style>
+
+</style>
+
+<script>
+
+$(function(){
+	
+	$('.wrap').height(win().h);
+	
+	
+	
+	
+	function makeSvg(code){
+		$('#map').html('');
+		var height = win().h;
+		var width = $('.wrap').width();
+		var background = '#fff';      //地图的背景色
+		var overColor = "#F08080";   //移入时的颜色
+		//创建父级元素
+		var svg = d3.select('#map').append('svg').attr('width',width).attr('height',height);
+		var chinaMap = svg.append('g').attr('class','maps'); 
+						chinaMap.append('g').attr('id','chinaMap'); //用来存放地图路径；
+						chinaMap.append('g').attr('id','text'); // 用来存放点与字
+		//定义投影
+		var projection = d3.geo.mercator()
+						.center([107, 38])
+						.scale(650)
+	    				.translate([width/2, height/2]);
+		
+		//定义地理路径生成器
+		var path = d3.geo.path().projection(projection);
+		//----------缩放部分-----------//
+		var zoom = d3.behavior.zoom();
+		zoom.scaleExtent([.5,12]).on('zoom',zoomfn);
+		svg.call(zoom);
+		//引入地图路径文件
+		d3.json('china.geojson',function(error,root){
+			if(error){
+				return console.log(error);
+			}
+			//生成地图
+			var pathMap = d3.select('#chinaMap').selectAll('.pathChina').data(root.features)
+							.enter().append('path').attr('stroke','#000').attr('class','pathChina')
+							.attr('stroke-width',0.1).attr('fill',function(d){
+								return background;
+							})
+							.attr("d", path );
+			
+			//用于区域块的背景变色
+			pathMap.each(function(d){
+				var da = code.data; //数组一枚
+				for(var i=0; i<da.length; i++){
+					//用citype==1,idname==省份的名字  来做判断区块的颜色显示
+					if(1===da[i].citype && da[i].idname === d.properties.name){ 
+						if(parseFloat(da[i].fla) > parseFloat(code.updown)){
+							d3.select(this).attr('fill','#FD8AA2');
+						}else if(parseFloat(da[i].fla) < parseFloat(code.updown) && parseFloat(da[i].fla) >= 1 ){
+							d3.select(this).attr('fill','#FECBD6');
+						}else if(parseFloat(da[i].fla) > -parseFloat(code.updown) && parseFloat(da[i].fla) <= -1 ){
+							d3.select(this).attr('fill','#B4F5E3');
+						}else if(parseFloat(da[i].fla) < -parseFloat(code.updown)){
+							d3.select(this).attr('fill','#D84C29');
+						}else if(0 === parseFloat(da[i].fla)){
+							d3.select(this).attr('fill','#FFFEEE');
+						}
+					}
+				}
+			});
+			
+			//移入移出的时候添加背景色	
+			var bgcolor;	
+			pathMap.on('mouseover',function(d,i){
+				bgcolor = d3.select(this).attr('fill');
+				d3.select(this).attr('fill',overColor);
+			}).on('mouseout',function(){
+				d3.select(this).attr('fill',bgcolor);
+			})
+		})
+		
+		//标注点
+		d3.select('#text').selectAll('circle').data(code.data)
+				.enter().append('circle').attr('r',3).attr('fill','#555')
+				.attr('transform',function(d,i){ 
+					var circleCode = projection([d.log,d.log2]);
+					return (zoom.scale()<1.2 && 1===d.citype) ? 'translate('+circleCode[0]+','+circleCode[1]+')':'translate(-9999,-9999)';
+				});
+		//标注字
+		d3.select('#text').selectAll('.text').data(code.data).enter().append('text').attr('class','text')
+				.attr('x',5).attr('y',3).style('font-size','0.6rem').style('cursor','pointer')
+				.attr('city',function(d){
+					return d.city;
+				})
+				.text(function(d){
+					return d.name+' ';
+				}).attr('transform',function(d){
+					var textCode = projection([d.log,d.log2]);
+					return (zoom.scale()<1.2 && 1===d.citype) ? 'translate('+textCode[0]+','+textCode[1]+')':'translate(-9999,-9999)';
+				}).append('tspan').text(function(d){
+					var fla = '';
+					if(d.fla>0){
+						fla = '+' + d.fla;
+					}else if(d.fla<0){
+						fla = d.fla;
+					}else{
+						fla = d.fla;
+					}
+					return d.value+' '+fla;
+				}).attr('fill',function(d){
+					var color = getColor(d.fla);
+					return color;
+				});
+		
+		$.each(code.data, function(i,a) {
+			var $comCity = $('.text[city='+a.city+']');
+			var len = $comCity.length;
+			if(len>1){
+				$comCity.each(function(i){
+					$(this).attr('y',10*i);
+				});
+			}
+		});
+		
+		
+		//文字上添加事件
+		d3.selectAll('.text').on('click',function(e){
+			console.log(e)
+		});
+		
+		//滚动缩放
+		function zoomfn(){
+			
+			if(zoom.scale()>1.2){
+				//点
+				d3.select('#text').selectAll('circle').attr('transform',function(d,i){
+					var circleCode = projection([d.log,d.log2]);
+					return 'translate('+circleCode[0]+','+circleCode[1]+')';
+				});
+				//字	
+				d3.select('#text').selectAll('.text').attr('transform',function(d){
+					var textCode = projection([d.log,d.log2]);
+					return 'translate('+textCode[0]+','+textCode[1]+')';
+				})
+			}else{
+				//点
+				d3.select('#text').selectAll('circle').attr('transform',function(d,i){
+					var circleCode = projection([d.log,d.log2]);
+					return (1===d.citype) ? 'translate('+circleCode[0]+','+circleCode[1]+')':'translate(-9999,-9999)';
+				});
+				//字		
+				d3.select('#text').selectAll('.text').attr('transform',function(d){
+					var textCode = projection([d.log,d.log2]);
+					return (1===d.citype) ? 'translate('+textCode[0]+','+textCode[1]+')':'translate(-9999,-9999)';
+				})
+			}
+			
+			d3.select(".maps").attr("transform","translate(" + zoom.translate() + ")" + "scale(" + zoom.scale() + ")");
+			d3.select(".maps").selectAll('circle').attr('r',3/zoom.scale());
+	        d3.select(".maps").selectAll('.pathChina').attr('stroke-width',.1/zoom.scale());
+			d3.select(".maps").selectAll('.text').each(function(d,i){
+				d3.select(this).style('font-size',.6/zoom.scale()+'rem').attr('x',5/zoom.scale()).attr('y',3/zoom.scale())
+			});
+			d3.select(".maps").selectAll('.text').each(function(d,i){
+				var $comCity = $('.text[city='+d.city+']');
+				var len = $comCity.length;
+				if(len>1){
+					$comCity.each(function(i){
+						d3.select(this).attr('y',10*i/zoom.scale())
+					});
+				}
+			});
+		}
+		
+		
+		/*--  点击按钮放大缩小地图   --*/
+		
+	function interpolateZoom (translate, scale) {
+		var self = this;
+		return d3.transition().duration(350).tween("zoom", function () {
+				var iTranslate = d3.interpolate(zoom.translate(), translate),
+	            	iScale = d3.interpolate(zoom.scale(), scale);
+	            	return function (t) {
+			            zoom.scale(iScale(t)).translate(iTranslate(t));
+			            zoomfn();
+			        };
+	    });
+	}
+	function zoomClick() {
+		var clicked = d3.event.target,
+        direction = 1,
+        factor = 0.2,
+        target_zoom = 1,
+        center = [width / 2, height / 2],
+        extent = zoom.scaleExtent(),
+        translate = zoom.translate(),
+        translate0 = [],
+        l = [],
+        view = {x: translate[0], y: translate[1], k: zoom.scale()};
+
+	    d3.event.preventDefault();
+	    direction = (this.id === 'zoom_in') ? 2 : -2;
+	    target_zoom = zoom.scale() * (1 + factor * direction);
+	    if (target_zoom < extent[0] || target_zoom > extent[1]) { 
+	    	return false;
+	    }
+	
+	    translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
+	    view.k = target_zoom;
+	    l = [translate0[0] * view.k + view.x, translate0[1] * view.k + view.y];
+	
+	    view.x += center[0] - l[0];
+	    view.y += center[1] - l[1];
+	
+	    interpolateZoom([view.x, view.y], view.k);
+	}
+
+	d3.select('#zoom_btn').selectAll('span').on('click', zoomClick);
+	/*--  点击按钮放大缩小地图 【结束】   --*/
+		
+		
+	}
+	
+	
+	
+	
+	//刷新按钮
+	$('#refresh').click(function(){
+		showdata();
+	});
+
+	
+	//获取数据
+	function showdata(){
+		$.ajax({
+			url:'data.json',
+			dataType:'json',
+			success:function(data){
+				var code = data;
+				makeSvg(code)
+			},
+			error:function(XMLHttpRequest, textStatus, errorThrown){
+				console.log(XMLHttpRequest)
+				console.log(textStatus)
+				console.log(errorThrown)
+			}
+		})
+	}
+	
+	
+	showdata();
+	
+	
+	
+});
+
+</script>
+
+</head>
+
+
+
+<body>
+
+
+
+<div class="wrap">
+	
+	<div id="map">
+		
+	</div>
+	
+	
+	
+	<div class="zoom_btn">
+		<span class="refresh" id="refresh"></span>
+		<div id="zoom_btn">
+			<span id="zoom_in">+</span>
+			<span id="zoom_out">-</span>
+		</div>
+	</div>
+	
+</div>
+
+
+<div class="wrap">
+	
+	<div id="map">
+		
+	</div>
+	<!-- 涨跌幅 -->
+	<ul class="up_down" id="upDown">
+		
+	</ul>
+	
+	<!-- 缩放 -->
+	<div class="zoom_btn" id="zoom_btn">
+		<span class="refresh" id="refresh"></span>
+		<span id="large">+</span>
+		<span id="small">-</span>
+	</div>
+	
+</div>
+
+<div class="ecWrap">
+	<span class="closeBtn">X</span>
+	<div class="mainCon">
+		<h2>抗震螺纹钢</h2>
+		<div class="tCon">
+			<ul class="clearfix thead">
+				<li>价格</li>
+				<li>涨幅</li>
+			</ul>
+			<div class="tbody">
+				<ul class="clearfix">
+					<li>4500</li>
+					<li>+30</li>
+				</ul>
+			</div>
+		</div>
+		<div id="main" style="width:400px; height:400px; margin-top:5px;"></div>
+	</div>	
+</div>
+
+
+
+
+
+
+
+
+</body>
+</html>
