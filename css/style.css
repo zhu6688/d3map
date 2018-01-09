@@ -1,0 +1,61 @@
+@charset "utf-8";
+*{margin:0; padding:0; list-style: none;}
+.clearfix:after{display:block; content:''; clear:both;}
+body{font-family:"微软雅黑"; font-size:14px; overflow:hidden;}
+
+.wrap{width:100%; margin:0 auto; position:relative; background-color:#f1f1f1;}
+/* 左上角的涨跌幅 */
+.up_down{position:absolute; width:100px; text-align:center; top:60px; left:5px; box-shadow: 0 0 5px;}
+.up_down li{line-height:26px; padding:0 12px;}
+.up_down .color1{background:#FD8AA2;}
+.up_down .color2{background:#FECBD6;}
+.up_down .color3{background:#FFFEEE;}
+.up_down .color4{background:#B4F5E3;}
+.up_down .color5{background:#D84C29;}
+/* 右上角的日周月 */
+.map_date{position:absolute; right:5px; top:60px;}
+.map_date span{float:left; cursor:pointer; display:inline-block; padding:3px 12px; border:1px solid #C8E0F0;} 
+.map_date .day{border-right:0; border-top-left-radius:6px; border-bottom-left-radius:6px;}
+.map_date .week{border-right:0;}
+.map_date .month{border-top-right-radius:6px; border-bottom-right-radius:6px;}
+.date_active{background:#C8E0F0; color:#fff;}
+/* 左下角的平均价 */
+.average_price{position:absolute; left:5px; bottom:20px; background:#fff;}
+.average_price ul{ border:1px solid #EEEEEE;height:60px; font-size:12px; }
+.average_price li{width:70px; float:left; margin:5px 1px; text-align: center; border-right:1px solid #EEEEEE;}
+.average_price li.aver_li{padding:9px 0;}
+.average_price li.last_border{border:0;}
+.average_price li p{white-space:nowrap; overflow: hidden; text-overflow:ellipsis;}
+.average_price li .title{color:#999999;}
+.c_red{color:red;}
+.c_green{color:green;}
+/* 右下角缩放按钮 */
+.zoom_btn{position:absolute; right:5px; bottom:20px; width:30px; text-align: center; background:#fff; border:1px solid #eee; border-radius:4px;}
+.zoom_btn span{margin-top:5px; cursor:pointer; display:block; height:30px; font-size:30px; color:#000; text-align: center;line-height: 30px;;}
+.zoom_btn .refresh{background:url(../img/fresh.png) no-repeat;width:15px; height:15px; background-size:cover; display:inline-block;}
+/* 顶部的选择 */
+.map_top{height:55px;position:absolute; width:100%; background:#fff; padding-left:5px;}
+.selectBox{position:relative; margin-top:10px; float:left;}
+.selectBox .selectText{cursor:pointer; display:block; width:295px; line-height: 30px;padding-left:5px; height:30px; border:1px solid #EEEEEE;}
+.select_ul{display:none; position: absolute; left:0; top:31px; width:600px; background:#fff;border-left:1px solid #eeeeee; border-top:1px solid #eee; z-index:1;border-right:0; }
+.select_ul li{cursor:pointer; text-align:center; box-sizing:border-box; float:left; width:50%; line-height: 30px; border-right:1px solid #eee; border-bottom:1px solid #eee;}
+.select_ul li:hover{background:#ccc; color: #fff;}
+.dateWrap{float:left;  margin-top:10px;border:1px solid #eee; margin-left:20px;}
+.dateWrap .isOk{cursor:pointer; display:inline-block; width:50px; height:32px; background:#C8E0F0; text-align: center; line-height:32px; color:#fff;}
+#daydate{width:145px; padding-left:5px;  height:30px; border:0;}
+#daydate:focus{outline:none;}
+
+/*  弹出框的样式图表    */
+.ecWrap{border:1px solid #333; box-shadow:2px 2px 15px; display:none; position:relative; width:400px; height:600px; background:#fff; position:fixed; top:50%; left:50%; margin-top:-300px; margin-left:-200px;}
+.ecWrap .closeBtn{position:absolute; right:5px; top:5px; border-radius:50%; height:20px; line-height: 20px;width:20px; border:1px solid #eee;cursor:pointer; text-align: center; box-shadow:0 0 5px #000;}
+.ecWrap .closeBtn:hover{background:#333333; color:#fff;}
+.ecWrap .mainCon{ margin-top:20px; width:100%;}
+.ecWrap h2{text-align: center; font-size:14px; line-height:30px; border-bottom: 1px solid #ccc;;}
+.ecWrap .tCon{font-size: 12px;}
+.ecWrap .thead{padding: 4px 0; border-bottom:1px solid #ccc;}
+.ecWrap .thead li{float:left; text-align: center; border-right:1px solid #ccc; height:20px; line-height: 20px;}
+.ecWrap .thead li:nth-child(1){width:49%;}
+.ecWrap .thead li:nth-child(2){width:50%; border-right:0;}
+
+.ecWrap .tbody{padding: 4px 0; border-bottom:1px solid #ccc;}
+.ecWrap .tbody li{float:left; text-align: center;  height:20px; line-height: 20px; width:50%;}
